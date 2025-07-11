@@ -1,0 +1,728 @@
+{
+  "info": {
+    "name": "Todo List API",
+    "description": "A comprehensive collection for the Todo List API with Bearer Token Authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User registration and login endpoints",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-save token from register response",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.token) {",
+                  "        pm.collectionVariables.set('authToken', response.token);",
+                  "        console.log('✅ Token saved from registration:', response.token.substring(0, 20) + '...');",
+                  "        console.log('🔐 You can now use protected endpoints!');",
+                  "    }",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with email and password to get JWT token"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-save token from login response",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.token) {",
+                  "        pm.collectionVariables.set('authToken', response.token);",
+                  "        console.log('✅ Token saved from login:', response.token.substring(0, 20) + '...');",
+                  "        console.log('🔐 You can now use protected endpoints!');",
+                  "    }",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Get current user profile (requires authentication)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ Profile retrieved successfully');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lists",
+      "description": "CRUD operations for todo lists",
+      "item": [
+        {
+          "name": "Get All Lists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lists"]
+            },
+            "description": "Get all lists for the authenticated user"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('✅ Lists retrieved:', response.data.length, 'lists found');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get List by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lists/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lists", "1"]
+            },
+            "description": "Get a specific list by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ List retrieved successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ List not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create New List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Work Tasks\",\n  \"description\": \"Tasks related to work projects\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lists"]
+            },
+            "description": "Create a new todo list"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('✅ List created successfully with ID:', response.data.id);",
+                  "} else if (pm.response.code === 400) {",
+                  "    console.log('❌ Bad request - check your input data');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update List",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Work Tasks\",\n  \"description\": \"Updated description for work tasks\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lists/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lists", "1"]
+            },
+            "description": "Update an existing list"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ List updated successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ List not found or access denied');",
+                  "} else if (pm.response.code === 400) {",
+                  "    console.log('❌ Bad request - check your input data');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete List",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lists/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lists", "1"]
+            },
+            "description": "Delete a list (will also delete all associated tasks)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ List deleted successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ List not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "description": "CRUD operations for tasks within lists",
+      "item": [
+        {
+          "name": "Get Tasks by List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/list/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "list", "1"]
+            },
+            "description": "Get all tasks in a specific list"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('✅ Tasks retrieved:', response.data.length, 'tasks found');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ List not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Get a specific task by ID"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ Task retrieved successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ Task not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create New Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"listId\": 1,\n  \"title\": \"Complete API documentation\",\n  \"description\": \"Write comprehensive API documentation\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2024-01-20T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Create a new task in a list"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('✅ Task created successfully with ID:', response.data.id);",
+                  "} else if (pm.response.code === 400) {",
+                  "    console.log('❌ Bad request - check your input data');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ List not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Task Title\",\n  \"description\": \"Updated task description\",\n  \"status\": \"in_progress\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-01-25T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Update an existing task"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ Task updated successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ Task not found or access denied');",
+                  "} else if (pm.response.code === 400) {",
+                  "    console.log('❌ Bad request - check your input data');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1", "status"]
+            },
+            "description": "Update only the status of a task"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ Task status updated successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ Task not found or access denied');",
+                  "} else if (pm.response.code === 400) {",
+                  "    console.log('❌ Bad request - check your input data');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Delete a specific task"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Check authentication status",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('❌ Authentication required! Please login first.');",
+                  "    console.log('💡 Run the \"Login User\" request to get your token.');",
+                  "} else if (pm.response.code === 200) {",
+                  "    console.log('✅ Task deleted successfully');",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log('❌ Task not found or access denied');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Utility",
+      "description": "Utility endpoints for API information and health checks",
+      "item": [
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api",
+              "host": ["{{baseUrl}}"],
+              "path": ["api"]
+            },
+            "description": "Get API documentation and available endpoints"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    console.log('✅ API documentation retrieved successfully');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the API is running and healthy"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('✅ Server is healthy - Uptime:', response.uptime, 'seconds');",
+                  "    console.log('🌍 Environment:', response.environment);",
+                  "} else {",
+                  "    console.log('❌ Server health check failed');",
+                  "}",
+                  "",
+                  "// Log response status",
+                  "console.log('📊 Response Status:', pm.response.status);",
+                  "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set Content-Type for JSON requests",
+          "if (pm.request.body && pm.request.body.mode === 'raw') {",
+          "    pm.request.headers.add({",
+          "        key: 'Content-Type',",
+          "        value: 'application/json'",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+} 
