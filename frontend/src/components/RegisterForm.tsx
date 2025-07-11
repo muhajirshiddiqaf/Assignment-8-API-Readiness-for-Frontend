@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate, Link } from 'react-router-dom';
 
-interface RegisterFormProps {
-  onSwitchToLogin: () => void;
-}
-
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
-  const { register, isLoading, error, clearError } = useAuth();
+const RegisterForm: React.FC = () => {
+  const { register, isLoading, error, successMessage, clearError, clearSuccessMessage } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -14,11 +11,29 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     confirmPassword: '',
   });
   const [validationError, setValidationError] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    clearError();
+    clearSuccessMessage();
+    setValidationError('');
+  }, [clearError, clearSuccessMessage]);
+
+  // Auto-navigate to login after successful registration
+  useEffect(() => {
+    if (successMessage && successMessage.includes('Registration successful')) {
+      const timer = setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Wait 2 seconds before switching to login
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (error) clearError();
+    if (successMessage) clearSuccessMessage();
     if (validationError) setValidationError('');
   };
 
@@ -36,21 +51,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      return;
-    }
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) return;
+    if (!validateForm()) return;
     try {
       await register({
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
+      // Registration successful - will auto-navigate to login after 2 seconds
     } catch (error) {
       // Error is handled by the useAuth hook
     }
@@ -60,24 +69,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title">Sign Up</h2>
-        
         {error && (
-          <div className="error-message">
-            {error}
-          </div>
+          <div className="error-message">{error}</div>
         )}
-
         {validationError && (
-          <div className="error-message">
-            {validationError}
+          <div className="error-message">{validationError}</div>
+        )}
+        {successMessage && (
+          <div className="success-message">
+            {successMessage}
+            {successMessage.includes('Registration successful') && (
+              <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8 }}>
+                Redirecting to login page...
+              </div>
+            )}
           </div>
         )}
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Username
-            </label>
+            <label htmlFor="username" className="form-label">Username</label>
             <input
               type="text"
               id="username"
@@ -89,11 +99,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
+            <label htmlFor="email" className="form-label">Email</label>
             <input
               type="email"
               id="email"
@@ -105,11 +112,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               type="password"
               id="password"
@@ -121,11 +125,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">
-              Confirm Password
-            </label>
+            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
@@ -137,7 +138,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
               required
             />
           </div>
-
           <button
             type="submit"
             className="form-button"
@@ -153,12 +153,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
             )}
           </button>
         </form>
-
         <div className="auth-switch">
           Already have an account?{' '}
-          <a href="#" onClick={onSwitchToLogin}>
-            Login here
-          </a>
+          <Link to="/login">Login here</Link>
         </div>
       </div>
     </div>

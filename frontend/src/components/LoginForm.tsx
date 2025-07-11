@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate, Link } from 'react-router-dom';
 
-interface LoginFormProps {
-  onSwitchToRegister: () => void;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
+const LoginForm: React.FC = () => {
   const { login, isLoading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,13 +22,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.email || !formData.password) {
-      return;
-    }
-
+    if (!formData.email || !formData.password) return;
     try {
       await login(formData);
+      navigate('/dashboard'); // Pindah ke dashboard setelah login sukses
     } catch (error) {
       // Error is handled by the useAuth hook
     }
@@ -36,18 +35,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title">Login</h2>
-        
         {error && (
-          <div className="error-message">
-            {error}
-          </div>
+          <div className="error-message">{error}</div>
         )}
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
+            <label htmlFor="email" className="form-label">Email</label>
             <input
               type="email"
               id="email"
@@ -59,11 +52,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               type="password"
               id="password"
@@ -75,7 +65,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
               required
             />
           </div>
-
           <button
             type="submit"
             className="form-button"
@@ -91,12 +80,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
             )}
           </button>
         </form>
-
         <div className="auth-switch">
           Don't have an account?{' '}
-          <a href="#" onClick={onSwitchToRegister}>
-            Sign up here
-          </a>
+          <Link to="/register">Sign up here</Link>
         </div>
       </div>
     </div>

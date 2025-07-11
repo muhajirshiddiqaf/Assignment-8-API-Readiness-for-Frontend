@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, successMessage, clearSuccessMessage } = useAuth();
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+
+  // Tampilkan pesan sukses login hanya saat successMessage ada
+  useEffect(() => {
+    if (successMessage && successMessage.toLowerCase().includes('login')) {
+      setShowLoginSuccess(true);
+      const timer = setTimeout(() => {
+        setShowLoginSuccess(false);
+        clearSuccessMessage();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, clearSuccessMessage]);
 
   const handleLogout = () => {
     logout();
@@ -42,6 +55,23 @@ const Dashboard: React.FC = () => {
           Logout
         </button>
       </div>
+
+      {showLoginSuccess && (
+        <div style={{
+          backgroundColor: '#d4edda',
+          color: '#155724',
+          padding: '1rem',
+          borderRadius: '8px',
+          marginBottom: '2rem',
+          border: '1px solid #c3e6cb',
+          fontWeight: 600,
+          fontSize: '1.1rem',
+          textAlign: 'center',
+          transition: 'opacity 0.5s',
+        }}>
+          {successMessage}
+        </div>
+      )}
 
       <div style={{ 
         backgroundColor: '#f8f9fa', 
