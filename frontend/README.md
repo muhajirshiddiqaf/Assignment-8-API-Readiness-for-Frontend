@@ -1,6 +1,6 @@
 # Todo App Frontend - Assignment 9
 
-Frontend React application untuk Todo App dengan fitur authentication.
+Frontend React application untuk Todo App dengan fitur authentication dan navigasi menggunakan React Router.
 
 ## Features
 
@@ -12,12 +12,14 @@ Frontend React application untuk Todo App dengan fitur authentication.
 - ✅ Form Validation
 - ✅ Error Handling
 - ✅ Loading States
+- ✅ Navigasi URL dengan React Router
 
 ## Tech Stack
 
 - **React 18** - UI Library
 - **TypeScript** - Type Safety
 - **Vite** - Build Tool & Dev Server
+- **React Router DOM** - Routing
 - **CSS** - Styling
 - **Fetch API** - HTTP Requests
 
@@ -28,7 +30,8 @@ src/
 ├── components/
 │   ├── LoginForm.tsx      # Login form component
 │   ├── RegisterForm.tsx   # Register form component
-│   └── Dashboard.tsx      # Dashboard after login
+│   ├── Dashboard.tsx      # Dashboard after login
+│   └── DebugInfo.tsx      # Debug info overlay
 ├── hooks/
 │   └── useAuth.ts         # Authentication custom hook
 ├── services/
@@ -40,37 +43,52 @@ src/
 └── index.css             # Global styles
 ```
 
-## Getting Started
+## 🚀 Cara Menjalankan Frontend (FE)
 
-### Prerequisites
+### 1. **Masuk ke folder frontend**
+```bash
+cd frontend
+```
 
-- Node.js (v16 or higher)
-- Backend server running (Assignment 8)
-
-### Installation
-
-1. Install dependencies:
+### 2. **Install dependencies**
 ```bash
 npm install
 ```
 
-2. Start development server:
+### 3. **Jalankan development server**
 ```bash
 npm run dev
 ```
 
-3. Open browser and navigate to:
+### 4. **Akses aplikasi di browser**
 ```
 http://localhost:5173
 ```
 
-### Build for Production
+### 5. **Navigasi Halaman**
+- **/login** — Halaman login
+- **/register** — Halaman register
+- **/dashboard** — Dashboard (hanya bisa diakses jika sudah login)
+- Navigasi otomatis setelah login/register/logout
+
+### 6. **Fitur Navigasi**
+- Menggunakan React Router DOM
+- URL berubah sesuai halaman
+- Proteksi route dashboard (redirect ke login jika belum login)
+- Link antar halaman login/register
+
+### 7. **Jika ada error**
+- Pastikan backend berjalan di port 3000
+- Pastikan proxy di `vite.config.ts` sudah benar
+- Cek console browser dan terminal untuk pesan error
+
+## Build for Production
 
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+## Preview Production Build
 
 ```bash
 npm run preview
@@ -94,7 +112,7 @@ Frontend terintegrasi dengan backend API dari Assignment 8:
 
 1. **Initial Load**: Check localStorage for existing token
 2. **Login**: Submit credentials → Receive JWT token → Store in localStorage
-3. **Register**: Submit user data → Create account → Auto-login
+3. **Register**: Submit user data → Create account → Auto-navigate ke login
 4. **Protected Routes**: Verify token before accessing dashboard
 5. **Logout**: Clear localStorage → Redirect to login
 
@@ -158,7 +176,7 @@ No environment variables required for development. API proxy is configured in `v
    - Navigate to sign up form
    - Fill in user details
    - Submit form
-   - Should redirect to dashboard
+   - Should redirect to login
 
 2. **Login Existing User**:
    - Navigate to login form
